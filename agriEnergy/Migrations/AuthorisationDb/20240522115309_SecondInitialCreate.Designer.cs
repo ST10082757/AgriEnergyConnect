@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using agriEnergy.Areas.Identity.Data;
 
@@ -11,13 +12,15 @@ using agriEnergy.Areas.Identity.Data;
 namespace agriEnergy.Migrations
 {
     [DbContext(typeof(AuthorisationContext))]
-    partial class AuthorisationContextModelSnapshot : ModelSnapshot
+    [Migration("20240522115309_SecondInitialCreate")]
+    partial class SecondInitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -47,6 +50,20 @@ namespace agriEnergy.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "dde8d8ab-246a-45bb-9fc0-e5aa1b845ce9",
+                            Name = "employee",
+                            NormalizedName = "employee"
+                        },
+                        new
+                        {
+                            Id = "98a26ee7-db3f-4339-9f7d-bb9b3fce7aa0",
+                            Name = "farmer",
+                            NormalizedName = "farmer"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
