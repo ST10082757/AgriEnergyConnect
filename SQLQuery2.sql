@@ -14,6 +14,8 @@ CREATE TABLE [dbo].[Products]
 	[Category] NVARCHAR(MAX) NULL,
 	[ProdDate] DATE NULL
 )
+drop table [dbo].[Products];
+
 
 CREATE TABLE [dbo].[Farmer]
 (
@@ -24,3 +26,10 @@ CREATE TABLE [dbo].[Farmer]
     CONSTRAINT Fk_product FOREIGN KEY (Id) REFERENCES [dbo].[Products]([Id])
 
 )
+
+CREATE TABLE Roles
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY (1, 1),
+	[roleName] NVARCHAR(MAX) NULL,
+)
+Drop table Roles;

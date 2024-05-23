@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using agriEnergy.Areas.Identity.Data;
+
+
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("AuthorisationContextConnection") ?? throw new InvalidOperationException("Connection string 'AuthorisationContextConnection' not found.");
 
+builder.Services.AddDbContext<AuthorisationContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDbContext<AuthorisationContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<agriEnergyUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<AuthorisationContext>();
