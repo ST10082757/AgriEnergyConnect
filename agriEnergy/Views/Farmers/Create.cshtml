@@ -1,0 +1,78 @@
+﻿@model addFarmers
+
+<div class="row">
+    <div class="col-md-8 mx-auto rounded border p-3">
+        <h2 class="text-center mb-5">Add Farmer</h2>
+
+        <form asp-action="Create" asp-controller="Farmers" method="post" enctype="multipart/form-data">
+
+
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Name</label>
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="name">
+                    <span asp-validation-for="name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Email</label>
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="email">
+                    <span asp-validation-for="email" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Roles</label>
+                <div class="col-sm-8">
+                    <select class="form-control" asp-for="role">
+                        <option value="Employee">Employee</option>
+                        <option value="Farmer">Farmer</option>
+                    </select>
+                    <span asp-validation-for="role" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Password</label>
+                <div class="col-sm-8">
+                    <div class="input-group">
+                        <input class="form-control" asp-for="password" type="password" id="passwordField">
+                        <span class="input-group-text">
+                            <input type="checkbox" onclick="togglePasswordVisibility()"> Show
+                        </span>
+                    </div>
+                    <span asp-validation-for="password" class="text-danger"></span>
+                </div>
+            </div>
+
+
+
+            <div class="row">
+                <div class="offset-sm-4 col-sm-4 d-grid">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                <div class="col-sm-4 d-grid">
+                    <a class="btn btn-outline-primary" asp-controller="Farmers" asp-action="Index" role="button">Cancel</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePasswordVisibility() {
+            var passwordField = document.getElementById("passwordField");
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+            } else {
+                passwordField.type = "password";
+            }
+        }
+    </script>
+
+}
