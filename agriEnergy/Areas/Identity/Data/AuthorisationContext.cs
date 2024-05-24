@@ -1,5 +1,4 @@
-﻿using agriEnergy.Areas.Identity.Data;
-using agriEnergy.Models;
+﻿using agriEnergy.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

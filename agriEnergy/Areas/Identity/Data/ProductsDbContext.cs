@@ -5,7 +5,7 @@ namespace agriEnergy.Areas.Identity.Data
 {
     public class ProductsDbContext : DbContext
     {
-        public ProductsDbContext(DbContextOptions options) : base(options)
+        public ProductsDbContext(DbContextOptions<ProductsDbContext> options) : base(options)
         {
 
         }
