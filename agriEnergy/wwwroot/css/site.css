@@ -51,3 +51,7 @@ login-layout-card li.nav-item{
 .login-layout-card .card-body{
     padding: 10px 20px;
 }
+.text-black {
+    color: black;
+    font-weight: bold;
+}

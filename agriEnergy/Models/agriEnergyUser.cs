@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
-namespace agriEnergy.Areas.Identity.Data;
+namespace agriEnergy.Models;
 
 // Add profile data for application users by adding properties to the agriEnergyUser class
 public class agriEnergyUser : IdentityUser

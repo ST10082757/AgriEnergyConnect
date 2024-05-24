@@ -1,8 +1,19 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using agriEnergy.Areas.Identity.Data
+
+@inject SignInManager<agriEnergyUser> SignInManager
+@inject UserManager<agriEnergyUser> UserManager
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+    @if (User.IsInRole("Farmer"))
+    {
+        <h1>Hello Employee</h1>
+    }
+
 </div>
