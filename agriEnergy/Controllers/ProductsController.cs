@@ -18,11 +18,25 @@ namespace agriEnergy.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filterType, string searchValue)
         {
-            var products = await _context.ProductsDetails.ToListAsync();
-            return View(products);
+            var products = from p in _context.ProductsDetails select p;
+
+            if (!string.IsNullOrEmpty(filterType) && !string.IsNullOrEmpty(searchValue))
+            {
+                if (filterType == "Date" && DateTime.TryParseExact(searchValue, "dd/MM/yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime filterDate))
+                {
+                    products = products.Where(p => p.date.Date == filterDate.Date);
+                }
+                else if (filterType == "Category")
+                {
+                    products = products.Where(p => p.category.Contains(searchValue));
+                }
+            }
+
+            return View(await products.ToListAsync());
         }
+
 
         [HttpGet]
         public IActionResult Create()

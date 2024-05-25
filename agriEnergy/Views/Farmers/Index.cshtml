@@ -32,6 +32,7 @@
                 <td class="text-black">@farmer.name</td>
                 <td class="text-black">@farmer.email</td>
                 <td class="text-black">@farmer.role</td>
+
                 <td style="white-space: nowrap">
                     <a class="btn btn-primary" asp-controller="Farmers" asp-action="Edit" asp-route-id="@farmer.Id">Edit</a>
                     <a class="btn btn-danger" asp-controller="Farmers" asp-action="Delete" asp-route-id="@farmer.Id" onclick="return confirm(are you sure?)">Delete</a>
