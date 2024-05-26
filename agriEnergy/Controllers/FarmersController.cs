@@ -1,75 +1,103 @@
 ﻿using agriEnergy.Areas.Identity.Data;
 using agriEnergy.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace agriEnergy.Controllers
 {
+    [Authorize(Roles = "Employee")]
     public class FarmersController : Controller
     {
         private readonly FarmerDbContext _context;
-        public FarmersController(FarmerDbContext context)
+        private readonly UserManager<agriEnergyUser> _userManager; // Inject UserManager
+
+        public FarmersController(FarmerDbContext context, UserManager<agriEnergyUser> userManager)
         {
-            this._context = context;
+            _context = context;
+            _userManager = userManager; // Initialize UserManager
         }
-        public IActionResult Index()
+        private async Task<bool> IsSpecialUser()
         {
+            var user = await _userManager.GetUserAsync(User);
+            return user?.Email == "user@employee.com";
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            if (!await IsSpecialUser() && !User.IsInRole("Employee"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var farmers = _context.Farmers.OrderByDescending(p => p.Id).ToList();
             return View(farmers);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            if (!await IsSpecialUser() && !User.IsInRole("Employee"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
 
+            return View();
         }
 
+
         [HttpPost]
-        public IActionResult Create(addFarmers addfarmers)
+        public async Task<IActionResult> Create(addFarmers addfarmers)
         {
+            if (!await IsSpecialUser() && !User.IsInRole("Employee"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (ModelState.IsValid)
             {
-                // Create a new Farmer entity and assign values from the addFarmers model
                 var farmer = new Farmers
                 {
                     name = addfarmers.name,
                     email = addfarmers.email,
-                    password = addfarmers.password,
-                    role = addfarmers.role // Assign role from the form
+                    password = HashPassword(addfarmers.password),
+                    role = addfarmers.role
                 };
 
-                // Add the farmer to the context and save changes
                 _context.Farmers.Add(farmer);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
-                // Redirect to the Farmers index action
+                var user = new agriEnergyUser
+                {
+                    UserName = addfarmers.email,
+                    Email = addfarmers.email,
+                    firstName = addfarmers.name
+                };
+
+                var result = await _userManager.CreateAsync(user, addfarmers.password);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, addfarmers.role);
+                }
+
                 return RedirectToAction("Index", "Farmers");
             }
-            // If ModelState is not valid, return to the create view with errors
+
             return View(addfarmers);
         }
 
-        // Helper method to hash the password
-        private string HashPassword(string password)
+
+        public async Task<IActionResult> Edit(int id)
         {
-            using (SHA256 sha256Hash = SHA256.Create())
+            if (!await IsSpecialUser() && !User.IsInRole("Employee"))
             {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
+                return RedirectToAction("Index", "Home");
             }
-        }
-        public IActionResult Edit(int id)
-        {
-            var farmer = _context.Farmers.Find(id);
 
+            var farmer = _context.Farmers.Find(id);
             if (farmer == null)
             {
                 return RedirectToAction(nameof(Index));
@@ -88,12 +116,17 @@ namespace agriEnergy.Controllers
             return View(editModel);
         }
 
+
+
         [HttpPost]
-        public IActionResult Edit(int id, addFarmers addfarmers)
+        public async Task<IActionResult> Edit(int id, addFarmers addfarmers)
         {
+            if (!await IsSpecialUser() && !User.IsInRole("Employee"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
 
-            var farmer = _context.Farmers.Find(id);
-
+            var farmer = await _context.Farmers.FindAsync(id);
             if (farmer == null)
             {
                 return RedirectToAction("Index", "Products");
@@ -102,27 +135,45 @@ namespace agriEnergy.Controllers
             farmer.name = addfarmers.name;
             farmer.email = addfarmers.email;
             farmer.role = addfarmers.role;
-            farmer.password = addfarmers.password;
+            farmer.password = HashPassword(addfarmers.password);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index", "Farmers");
-
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var farmer = _context.Farmers.Find(id);
+            if (!await IsSpecialUser() && !User.IsInRole("Employee"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
 
+            var farmer = await _context.Farmers.FindAsync(id);
             if (farmer == null)
             {
                 return RedirectToAction("Index", "Products");
             }
+
             _context.Farmers.Remove(farmer);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index", "Products");
+        }
+        // Helper method to hash the password
+        private string HashPassword(string password)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
 
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
         }
 
     }

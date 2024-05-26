@@ -5,6 +5,7 @@ namespace agriEnergy.Areas.Identity.Data
 {
     public class FarmerDbContext : DbContext
     {
+
         public FarmerDbContext(DbContextOptions options) : base(options)
         {
 

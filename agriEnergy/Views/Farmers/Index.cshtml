@@ -1,18 +1,22 @@
 ﻿@model List<Farmers>
 
 @{
+    ViewData["Title"] = "Farmers";
 }
 
 <h1 class="text-center">List of Farmers</h1>
 <h2 class="text-center mb-5">Farmers</h2>
 
-<div class="row mb-5">
-    <div class="col">
-        <a class="btn btn-primary" asp-controller="Farmers" asp-action="Create">New Farmer</a>
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="row mb-5">
+        <div class="col">
+            <a class="btn btn-primary" asp-controller="Farmers" asp-action="Create">New Farmer</a>
+        </div>
+        <div class="col">
+        </div>
     </div>
-    <div class="col">
-    </div>
-</div>
+}
 
 <table class="table">
     <thead>
@@ -21,7 +25,10 @@
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
-
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th>Actions</th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -33,10 +40,13 @@
                 <td class="text-black">@farmer.email</td>
                 <td class="text-black">@farmer.role</td>
 
-                <td style="white-space: nowrap">
-                    <a class="btn btn-primary" asp-controller="Farmers" asp-action="Edit" asp-route-id="@farmer.Id">Edit</a>
-                    <a class="btn btn-danger" asp-controller="Farmers" asp-action="Delete" asp-route-id="@farmer.Id" onclick="return confirm(are you sure?)">Delete</a>
-                </td>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <td style="white-space: nowrap">
+                        <a class="btn btn-primary" asp-controller="Farmers" asp-action="Edit" asp-route-id="@farmer.Id">Edit</a>
+                        <a class="btn btn-danger" asp-controller="Farmers" asp-action="Delete" asp-route-id="@farmer.Id" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                }
             </tr>
         }
     </tbody>

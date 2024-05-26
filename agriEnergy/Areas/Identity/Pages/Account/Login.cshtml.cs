@@ -21,11 +21,13 @@ namespace agriEnergy.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly SignInManager<agriEnergyUser> _signInManager;
+        private readonly UserManager<agriEnergyUser> _userManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<agriEnergyUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<agriEnergyUser> signInManager, UserManager<agriEnergyUser> userManager, ILogger<LoginModel> logger)
         {
             _signInManager = signInManager;
+            _userManager = userManager; // Correct initialization
             _logger = logger;
         }
 
@@ -87,7 +89,7 @@ namespace agriEnergy.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            if(User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
                 Response.Redirect("/");
             }
@@ -115,28 +117,42 @@ namespace agriEnergy.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                // Attempt to sign in the user
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
+                    // Retrieve the user by email
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+
+                    // Check if the user is a farmer
+                    var isFarmer = await _userManager.IsInRoleAsync(user, "Farmer");
+
+                    // If the user is a farmer, prevent access to employee-specific pages
+                    if (isFarmer)
+                    {
+                        ModelState.AddModelError(string.Empty, "You do not have permission to access employee resources.");
+                        await _signInManager.SignOutAsync();
+                        return Page();
+                    }
+
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
+
                 if (result.RequiresTwoFactor)
                 {
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
                 }
+
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
+
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return Page();
             }
 
             // If we got this far, something failed, redisplay form
