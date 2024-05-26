@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using agriEnergy.Areas.Identity.Data;
 using System.Threading.Tasks;
 using agriEnergy.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace agriEnergy
 {
@@ -12,7 +13,8 @@ namespace agriEnergy
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var connectionString = builder.Configuration.GetConnectionString("AuthorisationContextConnection") ?? throw new InvalidOperationException("Connection string 'AuthorisationContextConnection' not found."); ;
+            var connectionString = builder.Configuration.GetConnectionString("AuthorisationContextConnection")
+                                   ?? throw new InvalidOperationException("Connection string 'AuthorisationContextConnection' not found.");
 
             builder.Services.AddDbContext<AuthorisationContext>(options =>
                 options.UseSqlServer(connectionString));
@@ -25,10 +27,10 @@ namespace agriEnergy
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddDbContext<ProductsDbContext>(options =>
-                           {
-                               var connectionstring = builder.Configuration.GetConnectionString("AuthorisationContextConnection");
-                               options.UseSqlServer(connectionstring);
-                           });
+            {
+                var connectionstring = builder.Configuration.GetConnectionString("AuthorisationContextConnection");
+                options.UseSqlServer(connectionstring);
+            });
 
             builder.Services.AddDbContext<FarmerDbContext>(options =>
             {
@@ -37,6 +39,12 @@ namespace agriEnergy
             });
 
             builder.Services.AddRazorPages();
+
+            // Configure authorization policy
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("EmployeeOnly", policy => policy.RequireRole("Employee"));
+            });
 
             var app = builder.Build();
 
@@ -76,10 +84,10 @@ namespace agriEnergy
                 }
             }
 
+            // Ensure default user is created at startup
             using (var scope = app.Services.CreateScope())
             {
-                var userManager =
-                    scope.ServiceProvider.GetRequiredService<UserManager<agriEnergyUser>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<agriEnergyUser>>();
 
                 string email = "user@employee.com";
                 string password = "Test123!";
@@ -88,14 +96,19 @@ namespace agriEnergy
                 // Check if the email ends with "employee.com"
                 if (email.EndsWith("employee.com") && await userManager.FindByEmailAsync(email) == null)
                 {
-                    var user = new agriEnergyUser();
+                    var user = new agriEnergyUser
+                    {
+                        UserName = email,
+                        Email = email,
+                        firstName = firstName
+                    };
 
-                    user.UserName = email;
-                    user.Email = email;
-                    user.firstName = firstName;
-
-                    await userManager.CreateAsync(user, password);
-                    await userManager.AddToRoleAsync(user, "Employee");
+                    var result = await userManager.CreateAsync(user, password);
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, "Employee");
+                        // Add any additional roles needed
+                    }
                 }
             }
             app.Run();
