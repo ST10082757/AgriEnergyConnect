@@ -13,7 +13,12 @@
     
     @if (User.IsInRole("Farmer"))
     {
+        <h1>Hello Farmer</h1>
+    }
+    else if (User.IsInRole("Employee"))
+{
         <h1>Hello Employee</h1>
     }
+
 
 </div>

@@ -5,6 +5,8 @@ namespace agriEnergy.Models
 {
     public class Product
     {
+        [Required]
+
         public int Id { get; set; }
 
         [MaxLength(100)]
@@ -16,8 +18,8 @@ namespace agriEnergy.Models
         public DateTime date { get; set; }
 
         [Precision(16, 2)]
-        public decimal price { get; set;}
+        public decimal price { get; set; }
 
-       
+      
     }
 }
