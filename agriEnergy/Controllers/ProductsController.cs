@@ -5,6 +5,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using agriEnergy.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace agriEnergy.Controllers
 {
@@ -12,15 +14,24 @@ namespace agriEnergy.Controllers
     public class ProductsController : Controller
     {
         private readonly ProductsDbContext _context;
+        private readonly UserManager<agriEnergyUser> _userManager;
 
-        public ProductsController(ProductsDbContext context)
+        public ProductsController(ProductsDbContext context, UserManager<agriEnergyUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
+        private string GetUserId()
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
 
         public async Task<IActionResult> Index(string filterType, string searchValue)
         {
-            var products = from p in _context.ProductsDetails select p;
+            var userId = GetUserId();
+            var products = _context.ProductsDetails.Where(p => p.userID == userId);
 
             if (!string.IsNullOrEmpty(filterType) && !string.IsNullOrEmpty(searchValue))
             {
@@ -46,7 +57,10 @@ namespace agriEnergy.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Create(createProduct model)
-        {
+        {                
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get the current user's ID
+            ModelState.Remove("userID"); // Remove the userID from the model state to avoid validation errors
+
             if (ModelState.IsValid)
             {
                 var product = new Product
@@ -54,32 +68,24 @@ namespace agriEnergy.Controllers
                     productName = model.productName,
                     price = model.price,
                     category = model.category,
-                    date = DateTime.Now
+                    date = DateTime.Now,
+                    userID = userId
                 };
 
                 _context.ProductsDetails.Add(product);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index)); // Redirect to the Index action
             }
 
-            Product prod = new Product()
-            {
-                productName = model.productName,
-                price = model.price,
-                category = model.category,
-                date = DateTime.Now
-
-            }; 
-            
-            _context.ProductsDetails.Add(prod);
-            _context.SaveChanges();
-
+            // If model state is not valid, return the same view with the model to show validation errors
             return View(model);
         }
 
+        [HttpGet]
         public IActionResult Edit(int id)
         {
-            var product = _context.ProductsDetails.Find(id);
+            var userId = GetUserId();
+            var product = _context.ProductsDetails.FirstOrDefault(p => p.Id == id && p.userID == userId);
 
             if (product == null)
             {
@@ -88,54 +94,55 @@ namespace agriEnergy.Controllers
 
             var editModel = new createProduct
             {
+                Id = product.Id,
                 productName = product.productName,
                 price = product.price,
                 category = product.category
             };
 
-            ViewData["id"] = id;
             return View(editModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(createProduct model)
         {
-            if (!ModelState.IsValid)
-            {
-                ViewData["id"] = model.Id;
-                return View(model);
-            }
+            var userId = GetUserId();
+            ModelState.Remove("userID");
 
-            var product = await _context.ProductsDetails.FindAsync(model.Id);
-            if (product == null)
+            if (ModelState.IsValid)
             {
+                var product = await _context.ProductsDetails.FirstOrDefaultAsync(p => p.Id == model.Id && p.userID == userId);
+                if (product == null)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                product.productName = model.productName;
+                product.price = model.price;
+                product.category = model.category;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.ProductsDetails.Any(e => e.Id == model.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
                 return RedirectToAction(nameof(Index));
             }
 
-            // Update the existing product with the new values
-            product.productName = model.productName;
-            product.price = model.price;
-            product.category = model.category;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.ProductsDetails.Any(e => e.Id == model.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return RedirectToAction(nameof(Index));
+            ViewData["id"] = model.Id;
+            return View(model);
         }
-
         public IActionResult Delete(int id)
         {
             var product = _context.ProductsDetails.Find(id);

@@ -14,6 +14,9 @@ namespace agriEnergy.Models
         public string category { get; set; } = "";
 
         [Required]
+        [Range(0, double.MaxValue)]
         public decimal price { get; set; }
+        public string userID { get; set; } // Add this if not present
+
     }
 }
