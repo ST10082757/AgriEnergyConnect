@@ -29,6 +29,7 @@ namespace agriEnergy.Controllers
 
         public async Task<IActionResult> Index()
         {
+
             if (!await IsSpecialUser() && !User.IsInRole("Employee"))
             {
                 return RedirectToAction("Index", "Home");

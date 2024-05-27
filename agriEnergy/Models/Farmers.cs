@@ -18,6 +18,5 @@ namespace agriEnergy.Models
         [MaxLength(100)]
         public string password { get; set; } = "";
 
-       
     }
 }
