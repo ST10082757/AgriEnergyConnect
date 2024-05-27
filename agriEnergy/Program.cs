@@ -34,7 +34,18 @@ namespace agriEnergy
                 var connectionstring = builder.Configuration.GetConnectionString("AuthorisationContextConnection");
                 options.UseSqlServer(connectionstring);
             });
-  // Add services to the container.
+        
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.SlidingExpiration = true;
+            });
+
+            // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
 
