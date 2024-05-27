@@ -20,6 +20,7 @@ namespace agriEnergy.Models
         [Precision(16, 2)]
         public decimal price { get; set; }
 
-      
+        [Required]
+        public string userID { get; set; } = "";
     }
 }

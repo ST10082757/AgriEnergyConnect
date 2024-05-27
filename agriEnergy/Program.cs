@@ -23,9 +23,6 @@ namespace agriEnergy
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<AuthorisationContext>();
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
-
             builder.Services.AddDbContext<ProductsDbContext>(options =>
             {
                 var connectionstring = builder.Configuration.GetConnectionString("AuthorisationContextConnection");
@@ -37,7 +34,8 @@ namespace agriEnergy
                 var connectionstring = builder.Configuration.GetConnectionString("AuthorisationContextConnection");
                 options.UseSqlServer(connectionstring);
             });
-
+  // Add services to the container.
+            builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
 
             // Configure authorization policy
