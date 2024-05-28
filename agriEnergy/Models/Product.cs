@@ -22,5 +22,8 @@ namespace agriEnergy.Models
 
         [Required]
         public string userID { get; set; } = "";
+
+        // Navigation property to the user who added the product
+        public virtual agriEnergyUser User { get; set; }
     }
 }

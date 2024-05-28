@@ -30,8 +30,10 @@ namespace agriEnergy.Controllers
 
         public async Task<IActionResult> Index(string filterType, string searchValue)
         {
-            var userId = GetUserId();
-            var products = _context.ProductsDetails.Where(p => p.userID == userId);
+            var userId = GetUserId(); // Get the current user's ID
+            var products = _context.ProductsDetails.Include(p => p.User)
+                                                   .Where(p => p.userID == userId) // Filter by user ID
+                                                   .AsQueryable();
 
             if (!string.IsNullOrEmpty(filterType) && !string.IsNullOrEmpty(searchValue))
             {
@@ -81,13 +83,12 @@ namespace agriEnergy.Controllers
             return View(model);
         }
 
-        [HttpGet]
         public IActionResult Edit(int id)
         {
-            var userId = GetUserId();
-            var product = _context.ProductsDetails.FirstOrDefault(p => p.Id == id && p.userID == userId);
+            var userId = GetUserId(); // Get the current user's ID
+            var product = _context.ProductsDetails.Find(id);
 
-            if (product == null)
+            if (product == null || product.userID != GetUserId())
             {
                 return RedirectToAction(nameof(Index));
             }
@@ -106,48 +107,48 @@ namespace agriEnergy.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(createProduct model)
         {
-            var userId = GetUserId();
-            ModelState.Remove("userID");
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var product = await _context.ProductsDetails.FirstOrDefaultAsync(p => p.Id == model.Id && p.userID == userId);
-                if (product == null)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
-                product.productName = model.productName;
-                product.price = model.price;
-                product.category = model.category;
-
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.ProductsDetails.Any(e => e.Id == model.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-
+                ViewData["id"] = model.Id;
+                return View(model);
+            }
+            var userId = GetUserId(); // Get the current user's ID
+            var product = await _context.ProductsDetails.FindAsync(model.Id);
+            if (product == null || product.userID != userId)
+            {
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["id"] = model.Id;
-            return View(model);
+            // Update the existing product with the new values
+            product.productName = model.productName;
+            product.price = model.price;
+            product.category = model.category;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.ProductsDetails.Any(e => e.Id == model.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
+
         public IActionResult Delete(int id)
         {
+            var userId = GetUserId(); // Get the current user's ID
             var product = _context.ProductsDetails.Find(id);
 
-            if (product == null)
+            if (product == null || product.userID != userId)
             {
                 return RedirectToAction("Index", "Products");
             }

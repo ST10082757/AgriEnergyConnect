@@ -117,40 +117,22 @@ namespace agriEnergy.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // Attempt to sign in the user
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
-                    // Retrieve the user by email
-                    var user = await _userManager.FindByEmailAsync(Input.Email);
-
-                    // Check if the user is a farmer
-                    var isFarmer = await _userManager.IsInRoleAsync(user, "Farmer");
-
-                    // If the user is a farmer, prevent access to employee-specific pages
-                    if (isFarmer)
-                    {
-                        ModelState.AddModelError(string.Empty, "You do not have permission to access employee resources.");
-                        await _signInManager.SignOutAsync();
-                        return Page();
-                    }
-
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
-
                 if (result.RequiresTwoFactor)
                 {
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
                 }
-
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
-
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return Page();
             }

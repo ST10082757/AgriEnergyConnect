@@ -10,5 +10,7 @@ namespace agriEnergy.Areas.Identity.Data
 
         }
         public DbSet<Product> ProductsDetails { get; set; }
+    public DbSet<agriEnergyUser> AspNetUsers { get; set; } // Ensure it uses the correct table name
+
     }
 }
