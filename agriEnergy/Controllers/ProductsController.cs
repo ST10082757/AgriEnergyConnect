@@ -26,14 +26,24 @@ namespace agriEnergy.Controllers
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
-
+        private async Task<bool> IsEmployeeEmail()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            return user.Email.EndsWith("@employee.com");
+        }
 
         public async Task<IActionResult> Index(string filterType, string searchValue)
         {
             var userId = GetUserId(); // Get the current user's ID
-            var products = _context.ProductsDetails.Include(p => p.User)
-                                                   .Where(p => p.userID == userId) // Filter by user ID
-                                                   .AsQueryable();
+            var isEmployee = await IsEmployeeEmail(); // Check if the user's email ends with @employee.com
+
+            var products = _context.ProductsDetails.Include(p => p.User).AsQueryable();
+
+            if (!isEmployee)
+            {
+                // If not an employee, filter by user ID
+                products = products.Where(p => p.userID == userId);
+            }
 
             if (!string.IsNullOrEmpty(filterType) && !string.IsNullOrEmpty(searchValue))
             {
