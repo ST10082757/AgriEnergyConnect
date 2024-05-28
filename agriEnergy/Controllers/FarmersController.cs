@@ -29,7 +29,6 @@ namespace agriEnergy.Controllers
 
         public async Task<IActionResult> Index()
         {
-
             if (!await IsSpecialUser() && !User.IsInRole("Employee"))
             {
                 return RedirectToAction("Index", "Home");
@@ -60,17 +59,6 @@ namespace agriEnergy.Controllers
 
             if (ModelState.IsValid)
             {
-                var farmer = new Farmers
-                {
-                    name = addfarmers.name,
-                    email = addfarmers.email,
-                    password = HashPassword(addfarmers.password),
-                    role = addfarmers.role
-                };
-
-                _context.Farmers.Add(farmer);
-                await _context.SaveChangesAsync();
-
                 var user = new agriEnergyUser
                 {
                     UserName = addfarmers.email,
@@ -82,9 +70,25 @@ namespace agriEnergy.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, addfarmers.role);
+
+                    var farmer = new Farmers
+                    {
+                        name = addfarmers.name,
+                        email = addfarmers.email,
+                        password = user.PasswordHash, // use the hashed password from Identity
+                        role = addfarmers.role
+                    };
+
+                    _context.Farmers.Add(farmer);
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction("Index", "Farmers");
                 }
 
-                return RedirectToAction("Index", "Farmers");
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
 
             return View(addfarmers);

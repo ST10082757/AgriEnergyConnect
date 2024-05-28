@@ -40,6 +40,7 @@
             <th>Category</th>
             <th>Price</th>
             <th>Date</th>
+            <th>Added By</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -52,6 +53,7 @@
                 <td class="text-black">@product.category</td>
                 <td class="text-black">@product.price</td>
                 <td class="text-black">@product.date.ToString("dd/MM/yyyy")</td>
+                <td class="text-black">@product.User?.Email</td>
                 <td style="white-space: nowrap">
                     <a class="btn btn-primary" asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id">Edit</a>
                     <a class="btn btn-danger" asp-controller="Products" asp-action="Delete" asp-route-id="@product.Id" onclick="return confirm('Are you sure?')">Delete</a>

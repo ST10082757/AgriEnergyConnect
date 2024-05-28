@@ -53,7 +53,7 @@ namespace agriEnergy.Migrations.ProductsDb
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductsDetails");
+                    b.ToTable("ProductsDetails", (string)null);
                 });
 #pragma warning restore 612, 618
         }
