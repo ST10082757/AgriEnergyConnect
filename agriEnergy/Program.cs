@@ -13,7 +13,7 @@ namespace agriEnergy
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var connectionString = builder.Configuration.GetConnectionString("AuthorisationContextConnection")
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                                    ?? throw new InvalidOperationException("Connection string 'AuthorisationContextConnection' not found.");
 
             builder.Services.AddDbContext<AuthorisationContext>(options =>

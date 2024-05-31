@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using agriEnergy.Areas.Identity.Data;
 
@@ -12,11 +11,9 @@ using agriEnergy.Areas.Identity.Data;
 namespace agriEnergy.Migrations
 {
     [DbContext(typeof(AuthorisationContext))]
-    [Migration("20240521134129_Initial Create")]
-    partial class InitialCreate
+    partial class AuthorisationContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,7 +159,7 @@ namespace agriEnergy.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("agriEnergy.Areas.Identity.Data.agriEnergyUser", b =>
+            modelBuilder.Entity("agriEnergy.Models.agriEnergyUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -214,6 +211,10 @@ namespace agriEnergy.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("firstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -238,7 +239,7 @@ namespace agriEnergy.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("agriEnergy.Areas.Identity.Data.agriEnergyUser", null)
+                    b.HasOne("agriEnergy.Models.agriEnergyUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -247,7 +248,7 @@ namespace agriEnergy.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("agriEnergy.Areas.Identity.Data.agriEnergyUser", null)
+                    b.HasOne("agriEnergy.Models.agriEnergyUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -262,7 +263,7 @@ namespace agriEnergy.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("agriEnergy.Areas.Identity.Data.agriEnergyUser", null)
+                    b.HasOne("agriEnergy.Models.agriEnergyUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -271,7 +272,7 @@ namespace agriEnergy.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("agriEnergy.Areas.Identity.Data.agriEnergyUser", null)
+                    b.HasOne("agriEnergy.Models.agriEnergyUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

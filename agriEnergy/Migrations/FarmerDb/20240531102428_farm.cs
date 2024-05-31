@@ -2,18 +2,19 @@
 
 #nullable disable
 
-namespace agriEnergy.Migrations
+namespace agriEnergy.Migrations.FarmerDb
 {
     /// <inheritdoc />
-    public partial class OnCreate : Migration
+    public partial class farm : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "firstName",
-                table: "AspNetUsers",
-                type: "nvarchar(MAX)",
+                name: "role",
+                table: "Farmers",
+                type: "nvarchar(100)",
+                maxLength: 100,
                 nullable: false,
                 defaultValue: "");
         }
@@ -22,8 +23,8 @@ namespace agriEnergy.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "firstName",
-                table: "AspNetUsers");
+                name: "role",
+                table: "Farmers");
         }
     }
 }
