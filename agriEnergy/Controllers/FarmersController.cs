@@ -21,12 +21,24 @@ namespace agriEnergy.Controllers
             _context = context;
             _userManager = userManager; // Initialize UserManager
         }
+        //--------------------------------------------------------------------------------------------------------//
+
+        /// <summary>
+        /// Check if the current user is the special user with email "user@employee.com".
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async Task<bool> IsSpecialUser()
         {
             var user = await _userManager.GetUserAsync(User);
             return user?.Email == "user@employee.com";
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Display a list of farmers.
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> Index()
         {
             if (!await IsSpecialUser() && !User.IsInRole("Employee"))
@@ -37,7 +49,12 @@ namespace agriEnergy.Controllers
             var farmers = _context.Farmers.OrderByDescending(p => p.Id).ToList();
             return View(farmers);
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Display the farmer creation form.
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> Create()
         {
             if (!await IsSpecialUser() && !User.IsInRole("Employee"))
@@ -48,7 +65,13 @@ namespace agriEnergy.Controllers
             return View();
         }
 
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Handle the submission of the farmer creation form.
+        /// </summary>
+        /// <param name="addfarmers"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create(addFarmers addfarmers)
         {
@@ -93,7 +116,13 @@ namespace agriEnergy.Controllers
 
             return View(addfarmers);
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Display the farmer editing form.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
 
         public async Task<IActionResult> Edit(int id)
         {
@@ -121,7 +150,14 @@ namespace agriEnergy.Controllers
             return View(editModel);
         }
 
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Handle the submission of the farmer editing form.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="addfarmers"></param>
+        /// <returns></returns>
 
         [HttpPost]
         public async Task<IActionResult> Edit(int id, addFarmers addfarmers)
@@ -146,7 +182,13 @@ namespace agriEnergy.Controllers
 
             return RedirectToAction("Index", "Farmers");
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Handle the deletion of a farmer.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<IActionResult> Delete(int id)
         {
             if (!await IsSpecialUser() && !User.IsInRole("Employee"))
@@ -165,7 +207,14 @@ namespace agriEnergy.Controllers
 
             return RedirectToAction("Index", "Products");
         }
-        // Helper method to hash the password
+
+        //--------------------------------------------------------------------------------------------------------//
+
+        /// <summary>
+        /// Helper method to hash the password.
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns></returns>
         private string HashPassword(string password)
         {
             using (SHA256 sha256Hash = SHA256.Create())
@@ -183,3 +232,4 @@ namespace agriEnergy.Controllers
 
     }
 }
+//---------------------------------------- END OF FILE -------------------------------------------------------//

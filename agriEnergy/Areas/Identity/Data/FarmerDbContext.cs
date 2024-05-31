@@ -2,7 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace agriEnergy.Areas.Identity.Data
-{
+{//--------------------------------------------------------------------------------------------------------//
+
+        /// <summary>
+        /// DbContext class for the Farmer model
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
     public class FarmerDbContext : DbContext
     {
 
@@ -16,3 +22,4 @@ namespace agriEnergy.Areas.Identity.Data
     }
 
 }
+//---------------------------------------- END OF FILE -------------------------------------------------------//
