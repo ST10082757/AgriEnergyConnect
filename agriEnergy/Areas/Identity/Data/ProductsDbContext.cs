@@ -2,7 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace agriEnergy.Areas.Identity.Data
-{
+{//--------------------------------------------------------------------------------------------------------//
+
+        /// <summary>
+        /// DbContext class for the Products table
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
     public class ProductsDbContext : DbContext
     {
         public ProductsDbContext(DbContextOptions<ProductsDbContext> options) : base(options)
@@ -14,3 +20,4 @@ namespace agriEnergy.Areas.Identity.Data
 
     }
 }
+//---------------------------------------- END OF FILE -------------------------------------------------------//

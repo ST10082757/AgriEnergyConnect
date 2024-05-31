@@ -78,6 +78,8 @@ namespace agriEnergy
 
             app.MapRazorPages();
 
+//--------------------------------------------------------------------------------------------------------//
+
             // Ensure roles are created at startup
             using (var scope = app.Services.CreateScope())
             {
@@ -92,6 +94,7 @@ namespace agriEnergy
                     }
                 }
             }
+//--------------------------------------------------------------------------------------------------------//
 
             // Ensure default user is created at startup
             using (var scope = app.Services.CreateScope())
@@ -124,3 +127,4 @@ namespace agriEnergy
         }
     }
 }
+        //---------------------------------------- END OF FILE -------------------------------------------------------//

@@ -21,17 +21,37 @@ namespace agriEnergy.Controllers
             _context = context;
             _userManager = userManager;
         }
+      //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Get the current user's ID.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private string GetUserId()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
+        //--------------------------------------------------------------------------------------------------------//
+
+        /// <summary>
+        /// Check if the user's email ends with @employee.com.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async Task<bool> IsEmployeeEmail()
         {
             var user = await _userManager.GetUserAsync(User);
             return user.Email.EndsWith("@employee.com");
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Display a list of products with optional filtering.
+        /// </summary>
+        /// <param name="filterType"></param>
+        /// <param name="searchValue"></param>
+        /// <returns></returns>
         public async Task<IActionResult> Index(string filterType, string searchValue)
         {
             var userId = GetUserId(); // Get the current user's ID
@@ -59,14 +79,25 @@ namespace agriEnergy.Controllers
 
             return View(await products.ToListAsync());
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Display the product creation form.
+        /// </summary>
+        /// <returns></returns>
 
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Handle the submission of the product creation form.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create(createProduct model)
         {                
@@ -92,7 +123,13 @@ namespace agriEnergy.Controllers
             // If model state is not valid, return the same view with the model to show validation errors
             return View(model);
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Display the product editing form.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IActionResult Edit(int id)
         {
             var userId = GetUserId(); // Get the current user's ID
@@ -113,7 +150,13 @@ namespace agriEnergy.Controllers
 
             return View(editModel);
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Handle the submission of the product editing form.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Edit(createProduct model)
         {
@@ -152,7 +195,13 @@ namespace agriEnergy.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        //--------------------------------------------------------------------------------------------------------//
 
+        /// <summary>
+        /// Handle the deletion of a product.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IActionResult Delete(int id)
         {
             var userId = GetUserId(); // Get the current user's ID
@@ -171,3 +220,4 @@ namespace agriEnergy.Controllers
 
     }
 }
+        //---------------------------------------- END OF FILE -------------------------------------------------------//

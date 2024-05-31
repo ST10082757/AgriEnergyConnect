@@ -6,7 +6,13 @@ using Microsoft.EntityFrameworkCore;
 namespace agriEnergy.Areas.Identity.Data;
 
 public class AuthorisationContext : IdentityDbContext<agriEnergyUser>
-{
+{//--------------------------------------------------------------------------------------------------------//
+
+        /// <summary>
+        /// DbContext for Authorisation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
     public AuthorisationContext(DbContextOptions<AuthorisationContext> options)
         : base(options)
     {
@@ -20,3 +26,4 @@ public class AuthorisationContext : IdentityDbContext<agriEnergyUser>
         // Add your customizations after calling base.OnModelCreating(builder);
     }
 }
+//---------------------------------------- END OF FILE -------------------------------------------------------//
